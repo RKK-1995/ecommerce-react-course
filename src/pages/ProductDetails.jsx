@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProductById } from '../data/products';
+import { useCart } from '../context/CartContext';
 
 export const ProductDetails = () => {
 
@@ -9,15 +10,23 @@ export const ProductDetails = () => {
     const navigate = useNavigate();
            
      useEffect(() => {
-            const foundProduct = getProductById(id);
+        const foundProduct = getProductById(id);
 
-            if (!foundProduct) {
-                navigate("/");
-                return;
-            }
+        if (!foundProduct) {
+            navigate("/");
+            return;
+        }
 
-            setProduct(foundProduct);
-        }, [id]);
+        setProduct(foundProduct);
+    }, [id]);
+
+    if(!product){
+       return <h1>Loading...</h1>
+    }
+
+    const {addToCart,cartItems} = useCart();
+    const itemIntheCart = cartItems?cartItems.find((item)=>item.id === product.id):'';
+    const itemCountIntheCart = itemIntheCart? itemIntheCart.quantity:0;
 
     return (
         <div className='page'>
@@ -31,7 +40,7 @@ export const ProductDetails = () => {
                         <h1 className="product-detail-name">{product.name}</h1>
                         <p className="product-price">{product.price}</p>
                         <p className="product-description">{product.description}</p>
-                        <button className='btn btn-primary' onClick={""}>Add to Cart</button>
+                        <button className='btn btn-primary' onClick={()=>addToCart(product.id)}>Add to Cart  {itemCountIntheCart ? `(${itemCountIntheCart})`:''}</button>
                     </div>
                 </div>
                 )}
